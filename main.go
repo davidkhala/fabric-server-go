@@ -1,8 +1,9 @@
 package main
 
 import (
-	app "github.com/davidkhala/fabric-server-go"
+	app "github.com/davidkhala/fabric-server-go/apps"
 	_ "github.com/davidkhala/fabric-server-go/docs"
+	"github.com/davidkhala/fabric-server-go/gateway"
 	"github.com/davidkhala/goutils"
 	"github.com/davidkhala/goutils/restful"
 	swaggerFiles "github.com/swaggo/files"
@@ -18,10 +19,10 @@ func main() {
 	App := restful.Run(true)
 	App.GET("/", restful.Ping)
 
-	App.POST("/fabric/ping", app.PingFabric)
-	App.POST("/fabric/create-proposal", app.CreateProposal)
-	App.POST("/fabric/transact/process-proposal", app.ProcessProposal)
-	App.POST("/fabric/transact/commit", app.Commit)
+	App.POST("/fabric/ping", gateway.PingFabric)
+	App.POST("/fabric/create-proposal", gateway.CreateProposal)
+	App.POST("/fabric/transact/process-proposal", gateway.ProcessProposal)
+	App.POST("/fabric/transact/commit", gateway.Commit)
 	App.POST("/ecosystem/create-token", app.CreateToken)
 	App.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler)) // refers to /swagger/*any
 

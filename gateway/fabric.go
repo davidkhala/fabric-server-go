@@ -1,4 +1,4 @@
-package fabric_server_go
+package gateway
 
 import (
 	"context"
@@ -70,14 +70,14 @@ func ProcessProposal(c *gin.Context) {
 	var endorserNodes []model.Node
 	goutils.FromJson([]byte(endorsers), &endorserNodes)
 	for _, node := range endorserNodes {
-		var node_translated = golang.Node{
+		var nodeTranslated = golang.Node{
 			Node: tape.Node{
 				Addr:          node.Address,
 				TLSCARootByte: model.BytesFromString(node.TLSCARoot),
 			},
 			SslTargetNameOverride: node.SslTargetNameOverride,
 		}
-		grpcClient, _err := node_translated.AsGRPCClient()
+		grpcClient, _err := nodeTranslated.AsGRPCClient()
 		goutils.PanicError(_err) // TODO use strategy here
 		endorserClient := golang.EndorserFrom(grpcClient)
 		proposalResponse, _err := endorserClient.ProcessProposal(ctx, &signed)
@@ -114,14 +114,14 @@ func Commit(c *gin.Context) {
 	var ordererNode model.Node
 	goutils.FromJson([]byte(orderer), &ordererNode)
 
-	var node_translated = golang.Node{
+	var nodeTranslated = golang.Node{
 		Node: tape.Node{
 			Addr:          ordererNode.Address,
 			TLSCARootByte: model.BytesFromString(ordererNode.TLSCARoot),
 		},
 		SslTargetNameOverride: ordererNode.SslTargetNameOverride,
 	}
-	ordererGrpc, err := node_translated.AsGRPCClient()
+	ordererGrpc, err := nodeTranslated.AsGRPCClient()
 	goutils.PanicError(err)
 	var committer = golang.Committer{
 		AtomicBroadcastClient: golang.CommitterFrom(ordererGrpc),

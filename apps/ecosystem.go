@@ -1,4 +1,4 @@
-package fabric_server_go
+package apps
 
 import (
 	"github.com/davidkhala/fabric-server-go/model"

@@ -1,4 +1,4 @@
-package fabric_server_go
+package gateway
 
 import (
 	"bytes"
@@ -29,7 +29,7 @@ func CreateProposal(c *gin.Context) {
 	creator := model.BytesFromForm(c, "creator")
 	channel := c.PostForm("channel")
 	chaincode := c.PostForm("chaincode")
-	var args = []string{}
+	var args []string
 	goutils.FromJson([]byte(c.PostForm("args")), &args)
 	var rawTransient = c.PostForm("transient")
 	var transientBytes = map[string][]byte{}
@@ -73,7 +73,7 @@ func CreateUnSignedTx(proposal *peer.Proposal, responses []*peer.ProposalRespons
 	}
 
 	// the original payload
-	pPayl, err := tape.GetChaincodeProposalPayload(proposal.Payload)
+	pPayload, err := tape.GetChaincodeProposalPayload(proposal.Payload)
 	if err != nil {
 		return nil, err
 	}
@@ -104,7 +104,7 @@ func CreateUnSignedTx(proposal *peer.Proposal, responses []*peer.ProposalRespons
 	cea := &peer.ChaincodeEndorsedAction{ProposalResponsePayload: a1, Endorsements: endorsements}
 
 	// obtain the bytes of the proposal payload that will go to the transaction
-	propPayloadBytes, err := protoutil.GetBytesProposalPayloadForTx(pPayl) //, hdrExt.PayloadVisibility
+	propPayloadBytes, err := protoutil.GetBytesProposalPayloadForTx(pPayload) //, hdrExt.PayloadVisibility
 	if err != nil {
 		return nil, err
 	}
@@ -128,11 +128,11 @@ func CreateUnSignedTx(proposal *peer.Proposal, responses []*peer.ProposalRespons
 	}
 
 	// create the payload
-	payl := &common.Payload{Header: hdr, Data: txBytes}
-	paylBytes, err := protoutil.GetBytesPayload(payl)
+	payload := &common.Payload{Header: hdr, Data: txBytes}
+	bytesPayload, err := protoutil.GetBytesPayload(payload)
 	if err != nil {
 		return nil, err
 	}
-	return paylBytes, nil
+	return bytesPayload, nil
 
 }
