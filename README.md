@@ -17,12 +17,12 @@ docker pull ghcr.io/davidkhala/fabric-server-go:latest
 ### Go Package
  
 ```
-go get github.com/davidkhala/delphi-fabric/app
+go get github.com/davidkhala/fabric-server-go
 ```
 > This would not include server main function, but all (almost) functions and content to build your own server
 
 
-## Contributor
+## Dependencies
 - language:go 1.16
 - Key required modules
   - `github.com/davidkhala/fabric-common/golang`: Wrapper or alternative of fabric-sdk-go. 
@@ -31,6 +31,3 @@ go get github.com/davidkhala/delphi-fabric/app
   - `github.com/hyperledger/fabric`: fabric itself. Used by importing its package `/protoutil`
   - `github.com/davidkhala/goutils`: generic golang utils. Used for grpc, http and other syntax-reform cases
   - `github.com/swaggo/gin-swagger`: The swagger docs generator for gin framework.
-- modules for test purpose
-  - `github.com/kortschak/utter`: a pretty golang object printer
-  - 

@@ -1,4 +1,4 @@
-package apps
+package main
 
 import (
 	"github.com/davidkhala/fabric-server-go/model"

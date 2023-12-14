@@ -26,7 +26,7 @@ definitions:
 info:
   contact:
     email: david-khala@hotmail.com
-  title: github.com/davidkhala/delphi-fabric/app
+  title: github.com/davidkhala/fabric-server-go
   version: v0.0.0
 paths:
   /fabric/create-proposal:

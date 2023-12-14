@@ -2,7 +2,7 @@ package client
 
 import (
 	"github.com/davidkhala/fabric-common/golang"
-	app "github.com/davidkhala/fabric-server-go/apps"
+	app "github.com/davidkhala/fabric-server-go/main"
 	"github.com/davidkhala/fabric-server-go/model"
 	"github.com/davidkhala/goutils"
 	"github.com/davidkhala/goutils/http"

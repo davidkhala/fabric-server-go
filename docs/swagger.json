@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "title": "github.com/davidkhala/delphi-fabric/app",
+        "title": "github.com/davidkhala/fabric-server-go",
         "contact": {
             "email": "david-khala@hotmail.com"
         },
