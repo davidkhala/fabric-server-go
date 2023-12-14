@@ -1,9 +1,9 @@
 package client
 
 import (
-	"github.com/davidkhala/delphi-fabric/app"
-	"github.com/davidkhala/delphi-fabric/app/model"
 	"github.com/davidkhala/fabric-common/golang"
+	app "github.com/davidkhala/fabric-server-go"
+	"github.com/davidkhala/fabric-server-go/model"
 	"github.com/davidkhala/goutils"
 	"github.com/davidkhala/goutils/http"
 	tape "github.com/hyperledger-twgc/tape/pkg/infra"

@@ -2,8 +2,8 @@ package fabric_server_go
 
 import (
 	"bytes"
-	"github.com/davidkhala/delphi-fabric/app/model"
 	"github.com/davidkhala/fabric-common/golang"
+	"github.com/davidkhala/fabric-server-go/model"
 	"github.com/davidkhala/goutils"
 	"github.com/gin-gonic/gin"
 	tape "github.com/hyperledger-twgc/tape/pkg/infra"

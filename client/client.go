@@ -3,8 +3,8 @@ package client
 import (
 	"context"
 	"fmt"
-	"github.com/davidkhala/delphi-fabric/app/model"
 	"github.com/davidkhala/fabric-common/golang"
+	"github.com/davidkhala/fabric-server-go/model"
 	"github.com/davidkhala/goutils"
 	"github.com/golang/protobuf/proto"
 	tape "github.com/hyperledger-twgc/tape/pkg/infra"

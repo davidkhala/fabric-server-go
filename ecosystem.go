@@ -1,7 +1,7 @@
 package fabric_server_go
 
 import (
-	"github.com/davidkhala/delphi-fabric/app/model"
+	"github.com/davidkhala/fabric-server-go/model"
 	"github.com/davidkhala/goutils"
 	"github.com/davidkhala/goutils/http"
 	"github.com/gin-gonic/gin"

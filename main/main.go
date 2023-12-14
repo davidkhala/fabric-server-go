@@ -1,7 +1,8 @@
 package main
 
 import (
-	_ "github.com/davidkhala/delphi-fabric/app/docs"
+	app "github.com/davidkhala/fabric-server-go"
+	_ "github.com/davidkhala/fabric-server-go/docs"
 	"github.com/davidkhala/goutils"
 	"github.com/davidkhala/goutils/restful"
 	swaggerFiles "github.com/swaggo/files"
@@ -9,13 +10,14 @@ import (
 	"os"
 )
 
-// @title github.com/davidkhala/delphi-fabric/app
+// @title github.com/davidkhala/fabric-server-go
 // @version v0.0.0
 // @contact.email david-khala@hotmail.com
 func main() {
 
 	App := restful.Run(true)
 	App.GET("/", restful.Ping)
+
 	App.POST("/fabric/ping", app.PingFabric)
 	App.POST("/fabric/create-proposal", app.CreateProposal)
 	App.POST("/fabric/transact/process-proposal", app.ProcessProposal)

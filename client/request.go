@@ -2,7 +2,7 @@ package client
 
 // request.go is designed for http request towards server side
 import (
-	"github.com/davidkhala/delphi-fabric/app/model"
+	"github.com/davidkhala/fabric-server-go/model"
 	"github.com/davidkhala/goutils"
 	"github.com/davidkhala/goutils/http"
 	"github.com/hyperledger/fabric-protos-go/common"
