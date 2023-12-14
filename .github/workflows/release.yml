@@ -1,0 +1,26 @@
+name: release
+
+on:
+  workflow_dispatch:
+
+
+jobs:
+  release-server-go:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@main
+      - name: Log in to the Container registry
+        uses: docker/login-action@master
+        with:
+          registry: ghcr.io
+          username: davidkhala
+          password: ${{ secrets.GHCR_LOGIN }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@master
+        with:
+          context: ./app
+          push: true
+          tags: ghcr.io/davidkhala/fabric-server-go
+
