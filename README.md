@@ -8,18 +8,11 @@ To generate swagger docs
 3. access swagger: go to `/swagger/index.html`
 
 ## Release
-CD powered by Github Action.
-
 ### Docker
 ```
 docker pull ghcr.io/davidkhala/fabric-server-go:latest
 ```
-### Go Package
- 
-```
-go get github.com/davidkhala/fabric-server-go
-```
-> This would not include server main function, but all (almost) functions and content to build your own server
+
 
 
 ## Dependencies
