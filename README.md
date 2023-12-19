@@ -23,7 +23,6 @@ go get github.com/davidkhala/fabric-server-go
 
 
 ## Dependencies
-- language:go 1.16
 - Key required modules
   - `github.com/davidkhala/fabric-common/golang`: Wrapper or alternative of fabric-sdk-go. 
   - `github.com/gin-gonic/gin`: The using golang restful API framework
