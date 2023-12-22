@@ -3,20 +3,20 @@ module github.com/davidkhala/fabric-server-go
 go 1.20
 
 require (
-	github.com/davidkhala/fabric-common/golang v0.0.0-20231211122938-2c960c058505
-	github.com/davidkhala/goutils v1.5.4
+	github.com/davidkhala/fabric-common/golang v0.0.0-20231221233639-b354f14c02bf
+	github.com/davidkhala/goutils v1.5.5
 	github.com/davidkhala/goutils/grpc v0.0.0
 	github.com/davidkhala/goutils/restful v0.0.1
+	github.com/davidkhala/protoutil v0.0.1
 	github.com/gin-gonic/gin v1.9.1
-	github.com/golang/protobuf v1.5.2
-	github.com/google/uuid v1.3.0
+	github.com/golang/protobuf v1.5.3
+	github.com/google/uuid v1.3.1
 	github.com/hyperledger-twgc/tape v0.1.4
-	github.com/hyperledger/fabric v2.1.1+incompatible
-	github.com/hyperledger/fabric-protos-go v0.0.0-20220202165055-956c75de7b17
+	github.com/hyperledger/fabric-protos-go-apiv2 v0.3.1
 	github.com/kortschak/utter v1.5.0
 	github.com/pkg/errors v0.9.1
-	github.com/swaggo/files v0.0.0-20210815190702-a29dd2bc99b2
-	github.com/swaggo/gin-swagger v1.4.1
+	github.com/swaggo/files v1.0.1
+	github.com/swaggo/gin-swagger v1.6.0
 	github.com/swaggo/swag v1.16.2
 )
 
@@ -37,6 +37,8 @@ require (
 	github.com/go-playground/validator/v10 v10.14.0 // indirect
 	github.com/goccy/go-json v0.10.2 // indirect
 	github.com/gogo/protobuf v1.2.1 // indirect
+	github.com/hyperledger/fabric v2.1.1+incompatible // indirect
+	github.com/hyperledger/fabric-protos-go v0.0.0-20220202165055-956c75de7b17 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.4 // indirect
@@ -45,20 +47,20 @@ require (
 	github.com/mattn/go-isatty v0.0.19 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
-	github.com/pelletier/go-toml/v2 v2.0.8 // indirect
+	github.com/pelletier/go-toml/v2 v2.1.0 // indirect
 	github.com/sirupsen/logrus v1.8.1 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/ugorji/go/codec v1.2.11 // indirect
 	golang.org/x/arch v0.3.0 // indirect
-	golang.org/x/crypto v0.9.0 // indirect
-	golang.org/x/net v0.10.0 // indirect
-	golang.org/x/sys v0.8.0 // indirect
-	golang.org/x/text v0.9.0 // indirect
+	golang.org/x/crypto v0.16.0 // indirect
+	golang.org/x/net v0.19.0 // indirect
+	golang.org/x/sys v0.15.0 // indirect
+	golang.org/x/text v0.14.0 // indirect
 	golang.org/x/time v0.0.0-20201208040808-7e3f01d25324 // indirect
 	golang.org/x/tools v0.7.0 // indirect
-	google.golang.org/genproto v0.0.0-20200526211855-cb27e3aa2013 // indirect
-	google.golang.org/grpc v1.44.0 // indirect
-	google.golang.org/protobuf v1.30.0 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20231120223509-83a465c0220f // indirect
+	google.golang.org/grpc v1.59.0 // indirect
+	google.golang.org/protobuf v1.31.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

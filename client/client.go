@@ -6,14 +6,13 @@ import (
 	"github.com/davidkhala/fabric-common/golang"
 	"github.com/davidkhala/fabric-server-go/model"
 	"github.com/davidkhala/goutils"
+	"github.com/davidkhala/protoutil"
 	"github.com/golang/protobuf/proto"
-	tape "github.com/hyperledger-twgc/tape/pkg/infra"
-	"github.com/hyperledger/fabric-protos-go/common"
-	"github.com/hyperledger/fabric-protos-go/peer"
-	"github.com/hyperledger/fabric/protoutil"
+	"github.com/hyperledger/fabric-protos-go-apiv2/common"
+	"github.com/hyperledger/fabric-protos-go-apiv2/peer"
 )
 
-func InitOrPanic(config tape.CryptoConfig) *tape.Crypto {
+func InitOrPanic(config golang.CryptoConfig) *golang.Crypto {
 	cryptoObject, err := golang.LoadCryptoFrom(config)
 	goutils.PanicError(err)
 	return cryptoObject
@@ -24,7 +23,7 @@ func ReadPEMFile(file string) []byte {
 	goutils.PanicError(err)
 	return byteSlice
 }
-func GetProposalSigned(proposal string, signer *tape.Crypto) (signedBytes []byte) {
+func GetProposalSigned(proposal string, signer *golang.Crypto) (signedBytes []byte) {
 	var bytes = model.BytesFromString(proposal)
 	var signature, err = signer.Sign(bytes)
 	goutils.PanicError(err)
@@ -37,7 +36,7 @@ func GetProposalSigned(proposal string, signer *tape.Crypto) (signedBytes []byte
 	goutils.PanicError(err)
 	return
 }
-func CommitProposalAndSign(proposal string, signedBytes []byte, endorsers []model.Node, signer tape.Crypto) []byte {
+func CommitProposalAndSign(proposal string, signedBytes []byte, endorsers []model.Node, signer golang.Crypto) []byte {
 	_, payload := Propose(proposal, signedBytes, endorsers)
 	// sign the payload
 	sig, err := signer.Sign(payload)
@@ -53,7 +52,7 @@ func QueryProposal(proposal string, signedBytes []byte, endorsers []model.Node) 
 		if proposalResponse.Response.Status != 200 {
 			panic(proposalResponse.Response.Message)
 		}
-		return model.ShimResultFrom(proposalResponse).Payload
+		return model.ShimResultFrom(&proposalResponse).Payload
 	}
 	panic("no proposalResponses found")
 }
@@ -82,10 +81,8 @@ type Eventer struct {
 func EventerFrom(node model.Node) Eventer {
 
 	var node_translated = golang.Node{
-		Node: tape.Node{
-			Addr:          node.Address,
-			TLSCARootByte: model.BytesFromString(node.TLSCARoot),
-		},
+		Addr:                  node.Address,
+		TLSCARootByte:         model.BytesFromString(node.TLSCARoot),
 		SslTargetNameOverride: node.SslTargetNameOverride,
 	}
 	grpcClient, err := node_translated.AsGRPCClient()
@@ -93,7 +90,7 @@ func EventerFrom(node model.Node) Eventer {
 	return Eventer{golang.EventerFrom(context.Background(), grpcClient)}
 }
 
-func (e Eventer) WaitForTx(channel, txid string, signer *tape.Crypto) (txStatus string) {
+func (e Eventer) WaitForTx(channel, txid string, signer *golang.Crypto) (txStatus string) {
 	var seek = e.AsTransactionListener(txid)
 	signedEvent, err := seek.SignBy(channel, signer)
 	goutils.PanicError(err)

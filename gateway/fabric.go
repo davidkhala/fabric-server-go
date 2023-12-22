@@ -7,12 +7,12 @@ import (
 	"github.com/davidkhala/goutils"
 	"github.com/davidkhala/goutils/crypto"
 	"github.com/davidkhala/goutils/grpc"
+	"github.com/davidkhala/protoutil"
 	"github.com/gin-gonic/gin"
 	"github.com/golang/protobuf/proto"
 	tape "github.com/hyperledger-twgc/tape/pkg/infra"
-	"github.com/hyperledger/fabric-protos-go/common"
-	"github.com/hyperledger/fabric-protos-go/peer"
-	"github.com/hyperledger/fabric/protoutil"
+	"github.com/hyperledger/fabric-protos-go-apiv2/common"
+	"github.com/hyperledger/fabric-protos-go-apiv2/peer"
 	"net/http"
 )
 

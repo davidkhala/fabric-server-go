@@ -5,9 +5,9 @@ import (
 	"github.com/davidkhala/fabric-server-go/model"
 	"github.com/davidkhala/goutils"
 	"github.com/davidkhala/goutils/http"
-	"github.com/hyperledger/fabric-protos-go/common"
-	orderer2 "github.com/hyperledger/fabric-protos-go/orderer"
-	"github.com/hyperledger/fabric-protos-go/peer"
+	"github.com/hyperledger/fabric-protos-go-apiv2/common"
+	"github.com/hyperledger/fabric-protos-go-apiv2/orderer"
+	"github.com/hyperledger/fabric-protos-go-apiv2/peer"
 	"net/url"
 	"os"
 )
@@ -39,15 +39,15 @@ func Propose(proposal string, signedBytes []byte, endorsers []model.Node) (propo
 	return result.ParseOrPanic(response.BodyBytes())
 }
 
-func Commit(orderer model.Node, transactionBytes []byte) string {
-	orderer.TLSCARoot = model.BytesPacked([]byte(orderer.TLSCARoot))
+func Commit(_orderer model.Node, transactionBytes []byte) string {
+	_orderer.TLSCARoot = model.BytesPacked([]byte(orderer.TLSCARoot))
 	var body = url.Values{
-		"orderer":     {string(goutils.ToJson(orderer))},
+		"orderer":     {string(goutils.ToJson(_orderer))},
 		"transaction": {model.BytesPacked(transactionBytes)},
 	}
 	var _url = BuildURL("/fabric/transact/commit")
 	var response = http.PostForm(_url, body, nil)
-	var txResult = &orderer2.BroadcastResponse{}
+	var txResult = &orderer.BroadcastResponse{}
 	goutils.FromJson(response.BodyBytes(), txResult)
 	return common.Status_name[int32(txResult.Status)]
 }

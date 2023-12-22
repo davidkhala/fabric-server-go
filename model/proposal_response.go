@@ -1,7 +1,7 @@
 package model
 
 import (
-	"github.com/hyperledger/fabric-protos-go/peer"
+	"github.com/hyperledger/fabric-protos-go-apiv2/peer"
 )
 
 type Response struct {
@@ -13,7 +13,7 @@ type Response struct {
 	Payload string `protobuf:"bytes,3,opt,name=payload,proto3" json:"payload,omitempty"`
 }
 
-func ShimResultFrom(response peer.ProposalResponse) Response {
+func ShimResultFrom(response *peer.ProposalResponse) Response {
 	return Response{
 		response.Response.Status,
 		response.Response.Message,

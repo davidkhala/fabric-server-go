@@ -12,7 +12,7 @@ import (
 	"testing"
 )
 
-var cryptoConfig = tape.CryptoConfig{
+var cryptoConfig = golang.CryptoConfig{
 	MSPID:    "astriMSP",
 	PrivKey:  golang.FindKeyFilesOrPanic("/home/davidliu/delphi-fabric/config/ca-crypto-config/peerOrganizations/astri.org/users/Admin@astri.org/msp/keystore")[0],
 	SignCert: "/home/davidliu/delphi-fabric/config/ca-crypto-config/peerOrganizations/astri.org/users/Admin@astri.org/msp/signcerts/Admin@astri.org-cert.pem",

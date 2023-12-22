@@ -4,7 +4,7 @@ import (
 	"github.com/davidkhala/goutils"
 	"github.com/gin-gonic/gin"
 	"github.com/golang/protobuf/proto"
-	"github.com/hyperledger/fabric-protos-go/peer"
+	"github.com/hyperledger/fabric-protos-go-apiv2/peer"
 )
 
 func BytesFromForm(c *gin.Context, key string) []byte {
