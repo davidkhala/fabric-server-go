@@ -3,8 +3,8 @@ package model
 import (
 	"github.com/davidkhala/goutils"
 	"github.com/gin-gonic/gin"
-	"github.com/golang/protobuf/proto"
 	"github.com/hyperledger/fabric-protos-go-apiv2/peer"
+	"google.golang.org/protobuf/proto"
 )
 
 func BytesFromForm(c *gin.Context, key string) []byte {
@@ -35,14 +35,14 @@ type ProposalResponseResult struct {
 	Payload string `json:"payload"`
 }
 
-func (p *ProposalResponseResult) ParseOrPanic(jsonBytes []byte) ([]peer.ProposalResponse, []byte) {
+func (p *ProposalResponseResult) ParseOrPanic(jsonBytes []byte) ([]*peer.ProposalResponse, []byte) {
 	goutils.FromJson(jsonBytes, p)
-	var result = []peer.ProposalResponse{}
+	var result []*peer.ProposalResponse
 	for _, value := range p.ProposalResponses {
 		var pr = peer.ProposalResponse{}
 		err := proto.Unmarshal(BytesFromString(value), &pr)
 		goutils.PanicError(err)
-		result = append(result, pr)
+		result = append(result, &pr)
 	}
 	payload := BytesFromString(p.Payload)
 	return result, payload

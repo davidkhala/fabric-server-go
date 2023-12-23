@@ -9,10 +9,9 @@ import (
 	"github.com/davidkhala/goutils/grpc"
 	"github.com/davidkhala/protoutil"
 	"github.com/gin-gonic/gin"
-	"github.com/golang/protobuf/proto"
-	tape "github.com/hyperledger-twgc/tape/pkg/infra"
 	"github.com/hyperledger/fabric-protos-go-apiv2/common"
 	"github.com/hyperledger/fabric-protos-go-apiv2/peer"
+	"google.golang.org/protobuf/proto"
 	"net/http"
 )
 
@@ -40,7 +39,7 @@ func PingFabric(c *gin.Context) {
 		Certificate:           certificate,
 		WaitForReady:          true,
 	}
-	_, err = golang.Pings(address, param)
+	_, err = golang.Ping(address, param)
 
 	if err != nil {
 		c.String(http.StatusServiceUnavailable, "ServiceUnavailable")
@@ -65,16 +64,14 @@ func ProcessProposal(c *gin.Context) {
 	err := proto.Unmarshal(signedBytes, &signed)
 	goutils.PanicError(err)
 	ctx := context.Background()
-	var proposalResponses = []*peer.ProposalResponse{}
-	var proposalResponseAsStrings = []string{}
+	var proposalResponses []*peer.ProposalResponse
+	var proposalResponseAsStrings []string
 	var endorserNodes []model.Node
 	goutils.FromJson([]byte(endorsers), &endorserNodes)
 	for _, node := range endorserNodes {
 		var nodeTranslated = golang.Node{
-			Node: tape.Node{
-				Addr:          node.Address,
-				TLSCARootByte: model.BytesFromString(node.TLSCARoot),
-			},
+			Addr:                  node.Address,
+			TLSCARootByte:         model.BytesFromString(node.TLSCARoot),
 			SslTargetNameOverride: node.SslTargetNameOverride,
 		}
 		grpcClient, _err := nodeTranslated.AsGRPCClient()
@@ -115,10 +112,8 @@ func Commit(c *gin.Context) {
 	goutils.FromJson([]byte(orderer), &ordererNode)
 
 	var nodeTranslated = golang.Node{
-		Node: tape.Node{
-			Addr:          ordererNode.Address,
-			TLSCARootByte: model.BytesFromString(ordererNode.TLSCARoot),
-		},
+		Addr:                  ordererNode.Address,
+		TLSCARootByte:         model.BytesFromString(ordererNode.TLSCARoot),
 		SslTargetNameOverride: ordererNode.SslTargetNameOverride,
 	}
 	ordererGrpc, err := nodeTranslated.AsGRPCClient()

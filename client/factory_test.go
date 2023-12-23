@@ -6,7 +6,6 @@ import (
 	"github.com/davidkhala/fabric-server-go/model"
 	"github.com/davidkhala/goutils"
 	"github.com/davidkhala/goutils/http"
-	tape "github.com/hyperledger-twgc/tape/pkg/infra"
 	"github.com/kortschak/utter"
 	"net/url"
 	"testing"
@@ -34,7 +33,7 @@ var endorsers = []model.Node{
 	},
 }
 
-func postProposal(result model.CreateProposalResult, signer *tape.Crypto) {
+func postProposal(result model.CreateProposalResult, signer *golang.Crypto) {
 	var signedBytes = GetProposalSigned(result.Proposal, signer)
 	txid = result.Txid
 	var transactionBytes = CommitProposalAndSign(result.Proposal, signedBytes, endorsers, *signer)

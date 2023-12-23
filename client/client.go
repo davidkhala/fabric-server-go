@@ -7,9 +7,9 @@ import (
 	"github.com/davidkhala/fabric-server-go/model"
 	"github.com/davidkhala/goutils"
 	"github.com/davidkhala/protoutil"
-	"github.com/golang/protobuf/proto"
 	"github.com/hyperledger/fabric-protos-go-apiv2/common"
 	"github.com/hyperledger/fabric-protos-go-apiv2/peer"
+	"google.golang.org/protobuf/proto"
 )
 
 func InitOrPanic(config golang.CryptoConfig) *golang.Crypto {
@@ -48,11 +48,12 @@ func CommitProposalAndSign(proposal string, signedBytes []byte, endorsers []mode
 func QueryProposal(proposal string, signedBytes []byte, endorsers []model.Node) string {
 	parsedResult, _ := Propose(proposal, signedBytes, endorsers)
 	// TODO think of a reducer with validation
-	for _, proposalResponse := range parsedResult {
+	var proposalResponse *peer.ProposalResponse
+	for _, proposalResponse = range parsedResult {
 		if proposalResponse.Response.Status != 200 {
 			panic(proposalResponse.Response.Message)
 		}
-		return model.ShimResultFrom(&proposalResponse).Payload
+		return model.ShimResultFrom(proposalResponse).Payload
 	}
 	panic("no proposalResponses found")
 }

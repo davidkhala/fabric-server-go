@@ -20,7 +20,7 @@ func BuildURL(route string) string {
 	return baseUrl + route
 }
 
-func Propose(proposal string, signedBytes []byte, endorsers []model.Node) (proposalResponses []peer.ProposalResponse, payload []byte) {
+func Propose(proposal string, signedBytes []byte, endorsers []model.Node) (proposalResponses []*peer.ProposalResponse, payload []byte) {
 	// Send out
 	var _url = BuildURL("/fabric/transact/process-proposal")
 
@@ -40,7 +40,7 @@ func Propose(proposal string, signedBytes []byte, endorsers []model.Node) (propo
 }
 
 func Commit(_orderer model.Node, transactionBytes []byte) string {
-	_orderer.TLSCARoot = model.BytesPacked([]byte(orderer.TLSCARoot))
+	_orderer.TLSCARoot = model.BytesPacked([]byte(_orderer.TLSCARoot))
 	var body = url.Values{
 		"orderer":     {string(goutils.ToJson(_orderer))},
 		"transaction": {model.BytesPacked(transactionBytes)},

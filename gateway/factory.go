@@ -7,7 +7,6 @@ import (
 	"github.com/davidkhala/goutils"
 	"github.com/davidkhala/protoutil"
 	"github.com/gin-gonic/gin"
-	tape "github.com/hyperledger-twgc/tape/pkg/infra"
 	"github.com/hyperledger/fabric-protos-go-apiv2/common"
 	"github.com/hyperledger/fabric-protos-go-apiv2/peer"
 	"github.com/pkg/errors"
@@ -67,19 +66,13 @@ func CreateUnSignedTx(proposal *peer.Proposal, responses []*peer.ProposalRespons
 	}
 
 	// the original header
-	hdr, err := tape.GetHeader(proposal.Header)
+	hdr, err := protoutil.UnmarshalHeader(proposal.Header)
 	if err != nil {
 		return nil, err
 	}
 
 	// the original payload
-	pPayload, err := tape.GetChaincodeProposalPayload(proposal.Payload)
-	if err != nil {
-		return nil, err
-	}
-
-	// get header extensions so we have the visibility field
-	_, err = tape.GetChaincodeHeaderExtension(hdr)
+	pPayload, err := protoutil.UnmarshalChaincodeProposalPayload(proposal.Payload)
 	if err != nil {
 		return nil, err
 	}
@@ -117,10 +110,10 @@ func CreateUnSignedTx(proposal *peer.Proposal, responses []*peer.ProposalRespons
 	}
 
 	// create a transaction
-	taa := &peer.TransactionAction{Header: hdr.SignatureHeader, Payload: capBytes}
-	taas := make([]*peer.TransactionAction, 1)
-	taas[0] = taa
-	tx := &peer.Transaction{Actions: taas}
+	txAction := &peer.TransactionAction{Header: hdr.SignatureHeader, Payload: capBytes}
+	txActions := make([]*peer.TransactionAction, 1)
+	txActions[0] = txAction
+	tx := &peer.Transaction{Actions: txActions}
 	// serialize the tx
 	txBytes, err := protoutil.GetBytesTransaction(tx)
 	if err != nil {

@@ -15,7 +15,7 @@ import (
 // @contact.email david-khala@hotmail.com
 func main() {
 
-	app := restful.Run(true)
+	app := restful.App(true)
 	app.StaticFile("/favicon.ico", "./favicon.ico")
 	app.GET("/", restful.Ping)
 
