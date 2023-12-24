@@ -41,20 +41,21 @@ func postProposal(result model.CreateProposalResult, signer *golang.Crypto) {
 		TLSCARoot:             string(ReadPEMFile(goutils.HomeResolve("delphi-fabric/config/ca-crypto-config/ordererOrganizations/hyperledger/orderers/orderer0.hyperledger/tls/ca.crt"))),
 		SslTargetNameOverride: "orderer0.hyperledger",
 	}
+	println("...before commit transactionBytes")
 	var status = Commit(orderer, transactionBytes)
-	utter.Dump(status)
+	println("commit status=" + status)
 	waitForTx(txid)
 }
 func waitForTx(txid string) {
 	var eventer = EventerFrom(endorsers[0])
 	var signer = InitOrPanic(cryptoConfig)
 	var txStatus = eventer.WaitForTx(channel, txid, signer)
-	utter.Dump(txStatus)
+	println("tx status=" + txStatus)
 }
 func TestTransaction(t *testing.T) {
 	var signer = InitOrPanic(cryptoConfig)
 	var chaincode = "contracts"
-	var args = []string{"SmartContract:who"}
+	var args = []string{"StupidContract:ping"}
 
 	// build http
 	var body = url.Values{
