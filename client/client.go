@@ -45,17 +45,26 @@ func CommitProposalAndSign(proposal string, signedBytes []byte, endorsers []mode
 	var envelop = common.Envelope{Payload: payload, Signature: sig}
 	return protoutil.MarshalOrPanic(&envelop)
 }
-func QueryProposal(proposal string, signedBytes []byte, endorsers []model.Node) string {
+func QueryProposal(proposal string, signedBytes []byte, endorsers []model.Node) (result string) {
 	parsedResult, _ := Propose(proposal, signedBytes, endorsers)
-	// TODO think of a reducer with validation
 	var proposalResponse *peer.ProposalResponse
+
+	if len(parsedResult) == 0 {
+		panic("no proposalResponses found")
+	}
 	for _, proposalResponse = range parsedResult {
 		if proposalResponse.Response.Status != 200 {
 			panic(proposalResponse.Response.Message)
 		}
-		return model.ShimResultFrom(proposalResponse).Payload
+		var currentResult = model.ShimResultFrom(proposalResponse).Payload
+		if result != "" && result != currentResult {
+			panic(fmt.Sprintf("expect result aligning to %s, but got %s", result, currentResult))
+		} else {
+			result = currentResult
+		}
 	}
-	panic("no proposalResponses found")
+	return
+
 }
 
 type GetTransactionByIDResult struct {
