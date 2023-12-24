@@ -35,11 +35,6 @@ func BuildURL(str string) string {
 	return "http://localhost:" + port + str
 }
 
-type CreateTokenResult struct {
-	model.CreateProposalResult
-	Token string `json:"token"`
-}
-
 // CreateToken
 // @Param owner formData string true "Token owner"
 // @Param content formData string true "Token Content"
@@ -81,6 +76,6 @@ func CreateToken(c *gin.Context) {
 	response := http.PostForm(_url, body, nil)
 	var result = model.CreateProposalResult{}
 	goutils.FromJson(response.BodyBytes(), &result)
-	c.JSON(http2.StatusOK, CreateTokenResult{result, token})
+	c.JSON(http2.StatusOK, model.CreateTokenResult{result, token})
 
 }

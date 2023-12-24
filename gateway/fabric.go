@@ -103,8 +103,8 @@ func ProcessProposal(c *gin.Context) {
 // @Param transaction formData string true "serialized signed proposalResponses as envelop protobuf with hex format"
 // @Success 200 {object} model.TxResult
 func Commit(c *gin.Context) {
-	orderer := c.PostForm("orderer")
-	transaction := model.BytesFromForm(c, "transaction")
+	var orderer = c.PostForm("orderer")
+	var transaction = model.BytesFromForm(c, "transaction")
 	var envelop = &common.Envelope{}
 	err := proto.Unmarshal(transaction, envelop)
 	goutils.PanicError(err)

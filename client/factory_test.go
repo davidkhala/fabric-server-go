@@ -2,7 +2,6 @@ package client
 
 import (
 	"github.com/davidkhala/fabric-common/golang"
-	app "github.com/davidkhala/fabric-server-go/main"
 	"github.com/davidkhala/fabric-server-go/model"
 	"github.com/davidkhala/goutils"
 	"github.com/davidkhala/goutils/http"
@@ -13,8 +12,8 @@ import (
 
 var cryptoConfig = golang.CryptoConfig{
 	MSPID:    "astriMSP",
-	PrivKey:  golang.FindKeyFilesOrPanic("/home/davidliu/delphi-fabric/config/ca-crypto-config/peerOrganizations/astri.org/users/Admin@astri.org/msp/keystore")[0],
-	SignCert: "/home/davidliu/delphi-fabric/config/ca-crypto-config/peerOrganizations/astri.org/users/Admin@astri.org/msp/signcerts/Admin@astri.org-cert.pem",
+	PrivKey:  golang.FindKeyFilesOrPanic("/home/david/delphi-fabric/config/ca-crypto-config/peerOrganizations/astri.org/users/Admin@astri.org/msp/keystore")[0],
+	SignCert: "/home/david/delphi-fabric/config/ca-crypto-config/peerOrganizations/astri.org/users/Admin@astri.org/msp/signcerts/Admin@astri.org-cert.pem",
 }
 
 // client side cache
@@ -23,12 +22,12 @@ var channel = "allchannel"
 var endorsers = []model.Node{
 	{
 		Address:               "localhost:8051",
-		TLSCARoot:             string(ReadPEMFile("/home/davidliu/delphi-fabric/config/ca-crypto-config/peerOrganizations/icdd/tlsca/tlsca.icdd-cert.pem")),
+		TLSCARoot:             string(ReadPEMFile("/home/david/delphi-fabric/config/ca-crypto-config/peerOrganizations/icdd/tlsca/tlsca.icdd-cert.pem")),
 		SslTargetNameOverride: "peer0.icdd",
 	},
 	{
 		Address:               "localhost:7051",
-		TLSCARoot:             string(ReadPEMFile("/home/davidliu/delphi-fabric/config/ca-crypto-config/peerOrganizations/astri.org/peers/peer0.astri.org/tls/ca.crt")),
+		TLSCARoot:             string(ReadPEMFile("/home/david/delphi-fabric/config/ca-crypto-config/peerOrganizations/astri.org/peers/peer0.astri.org/tls/ca.crt")),
 		SslTargetNameOverride: "peer0.astri.org",
 	},
 }
@@ -39,7 +38,7 @@ func postProposal(result model.CreateProposalResult, signer *golang.Crypto) {
 	var transactionBytes = CommitProposalAndSign(result.Proposal, signedBytes, endorsers, *signer)
 	var orderer = model.Node{
 		Address:               "localhost:7050",
-		TLSCARoot:             string(ReadPEMFile("/home/davidliu/delphi-fabric/config/ca-crypto-config/ordererOrganizations/hyperledger/orderers/orderer0.hyperledger/tls/ca.crt")),
+		TLSCARoot:             string(ReadPEMFile("/home/david/delphi-fabric/config/ca-crypto-config/ordererOrganizations/hyperledger/orderers/orderer0.hyperledger/tls/ca.crt")),
 		SslTargetNameOverride: "orderer0.hyperledger",
 	}
 	var status = Commit(orderer, transactionBytes)
@@ -54,8 +53,8 @@ func waitForTx(txid string) {
 }
 func TestTransaction(t *testing.T) {
 	var signer = InitOrPanic(cryptoConfig)
-	var chaincode = "diagnose"
-	var args = []string{"whoami"}
+	var chaincode = "contracts"
+	var args = []string{"SmartContract:who"}
 
 	// build http
 	var body = url.Values{
@@ -68,8 +67,30 @@ func TestTransaction(t *testing.T) {
 	var response = http.PostForm(_url, body, nil)
 	var result = model.CreateProposalResult{}
 	goutils.FromJson(response.BodyBytes(), &result)
-	// sign
+	utter.Dump(result)
 	postProposal(result, signer)
+}
+func TestQuery(t *testing.T) {
+	var signer = InitOrPanic(cryptoConfig)
+	var chaincode = "contracts"
+	var args = []string{"SmartContract:who"}
+	var body = url.Values{
+		"creator":   {model.BytesPacked(signer.Creator)},
+		"channel":   {channel},
+		"chaincode": {chaincode},
+		"args":      {string(goutils.ToJson(args))},
+	}
+
+	var _url = BuildURL("/fabric/create-proposal")
+	var response = http.PostForm(_url, body, nil)
+	var result = model.CreateProposalResult{}
+	goutils.FromJson(response.BodyBytes(), &result)
+	utter.Dump(result)
+
+	// phase 2: QueryProposal
+	var signedBytes = GetProposalSigned(result.Proposal, signer)
+	var queryResult = QueryProposal(result.Proposal, signedBytes, endorsers)
+	println(queryResult)
 }
 func TestCreateToken(t *testing.T) {
 	var signer = InitOrPanic(cryptoConfig)
@@ -82,7 +103,7 @@ func TestCreateToken(t *testing.T) {
 	}
 	var _url = BuildURL("/ecosystem/createToken")
 	var response = http.PostForm(_url, body, nil)
-	var result = app.CreateTokenResult{}
+	var result = model.CreateTokenResult{}
 	goutils.FromJson(response.BodyBytes(), &result)
 	utter.Dump("Token:" + result.Token)
 	postProposal(result.CreateProposalResult, signer)
