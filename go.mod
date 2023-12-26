@@ -3,7 +3,7 @@ module github.com/davidkhala/fabric-server-go
 go 1.20
 
 require (
-	github.com/davidkhala/fabric-common/golang v0.0.3
+	github.com/davidkhala/fabric-common/golang v0.0.5
 	github.com/davidkhala/goutils v1.5.7
 	github.com/davidkhala/goutils/grpc v0.0.0
 	github.com/davidkhala/goutils/restful v0.1.0

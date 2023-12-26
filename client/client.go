@@ -108,8 +108,7 @@ func (e Eventer) WaitForTx(channel, txid string, signer *golang.Crypto) (txStatu
 	var seek = txEventer.GetSeekInfo()
 	signedEvent, err := seek.SignBy(channel, signer)
 	goutils.PanicError(err)
-	receipt, _, err := txEventer.SendRecv(signedEvent)
-	goutils.PanicError(err)
+	receipt, _ := txEventer.SendRecv(signedEvent)
 	txStatus = receipt.(string)
 	return
 }
