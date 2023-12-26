@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/davidkhala/fabric-common/golang"
+	"github.com/davidkhala/fabric-common/golang/event"
 	"github.com/davidkhala/fabric-server-go/model"
 	"github.com/davidkhala/goutils"
 	"github.com/davidkhala/protoutil"
@@ -84,7 +85,7 @@ func (GetTransactionByIDResult) FromString(str string) GetTransactionByIDResult 
 }
 
 type Eventer struct {
-	golang.Eventer
+	event.BlockEventer
 }
 
 // TODO support multiple eventer
@@ -97,14 +98,18 @@ func EventerFrom(node model.Node) Eventer {
 	}
 	grpcClient, err := node_translated.AsGRPCClient()
 	goutils.PanicError(err)
-	return Eventer{golang.EventerFrom(context.Background(), grpcClient)}
+	var baseEventer = event.NewEventer(context.Background(), grpcClient)
+	var blockEventer = event.NewBlockEventer(baseEventer)
+	return Eventer{blockEventer}
 }
 
 func (e Eventer) WaitForTx(channel, txid string, signer *golang.Crypto) (txStatus string) {
-	var seek = e.AsTransactionListener(txid)
+	var txEventer = event.NewTransactionListener(e.BlockEventer, txid)
+	var seek = txEventer.GetSeekInfo()
 	signedEvent, err := seek.SignBy(channel, signer)
 	goutils.PanicError(err)
-	_, err = e.SendRecv(signedEvent)
+	receipt, _, err := txEventer.SendRecv(signedEvent)
 	goutils.PanicError(err)
-	return fmt.Sprint(e.ReceiptData)
+	txStatus = receipt.(string)
+	return
 }

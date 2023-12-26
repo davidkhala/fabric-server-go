@@ -50,7 +50,7 @@ func (p *ProposalResponseResult) ParseOrPanic(jsonBytes []byte) ([]*peer.Proposa
 
 type Node struct {
 	Address               string `json:"address"`
-	TLSCARoot             string `json:"tlsca-root"`
+	TLSCARoot             string `json:"tlsca-root"` // string format of pem bytes, not file path
 	SslTargetNameOverride string `json:"ssl-target-name-override"`
 }
 

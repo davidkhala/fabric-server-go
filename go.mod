@@ -3,8 +3,8 @@ module github.com/davidkhala/fabric-server-go
 go 1.20
 
 require (
-	github.com/davidkhala/fabric-common/golang v0.0.1
-	github.com/davidkhala/goutils v1.5.6
+	github.com/davidkhala/fabric-common/golang v0.0.3
+	github.com/davidkhala/goutils v1.5.7
 	github.com/davidkhala/goutils/grpc v0.0.0
 	github.com/davidkhala/goutils/restful v0.1.0
 	github.com/davidkhala/protoutil v0.0.1
@@ -56,8 +56,8 @@ require (
 	golang.org/x/sys v0.15.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
 	golang.org/x/tools v0.7.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20231120223509-83a465c0220f // indirect
-	google.golang.org/grpc v1.59.0 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20231212172506-995d672761c0 // indirect
+	google.golang.org/grpc v1.60.1 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
