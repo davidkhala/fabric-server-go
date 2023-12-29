@@ -18,6 +18,13 @@ func main() {
 	app := restful.App(true)
 	app.StaticFile("/favicon.ico", "./favicon.ico")
 	app.GET("/", restful.Ping)
+	port, exists := os.LookupEnv("PORT")
+	if !exists {
+		port = "8080"
+	}
+	restful.SetContext(map[string]any{
+		port: port,
+	}, app)
 
 	app.POST("/fabric/ping", gateway.PingFabric)
 	app.POST("/fabric/create-proposal", gateway.CreateProposal)
@@ -26,9 +33,5 @@ func main() {
 	app.POST("/ecosystem/create-token", CreateToken)
 	app.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler)) // refers to /swagger/*any
 
-	port, exists := os.LookupEnv("PORT")
-	if !exists {
-		port = "8080"
-	}
 	goutils.PanicError(app.Run(":" + port))
 }

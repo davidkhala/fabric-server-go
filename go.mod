@@ -6,7 +6,7 @@ require (
 	github.com/davidkhala/fabric-common/golang v0.0.5
 	github.com/davidkhala/goutils v1.5.7
 	github.com/davidkhala/goutils/grpc v0.0.0
-	github.com/davidkhala/goutils/restful v0.1.0
+	github.com/davidkhala/goutils/restful v0.1.1
 	github.com/davidkhala/protoutil v0.0.1
 	github.com/gin-gonic/gin v1.9.1
 	github.com/google/uuid v1.5.0

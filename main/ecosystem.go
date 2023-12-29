@@ -8,7 +8,6 @@ import (
 	"github.com/google/uuid"
 	http2 "net/http"
 	"net/url"
-	"os"
 	"time"
 )
 
@@ -26,13 +25,13 @@ func tokenGenerator() string {
 	return id.String()
 }
 
-func BuildURL(str string) string {
-	// TODO replace by service discovery
-	port, exists := os.LookupEnv("PORT")
+func BuildURL(context *gin.Context, str string) string {
+
+	port, exists := context.Get("port")
 	if !exists {
 		port = "8080"
 	}
-	return "http://localhost:" + port + str
+	return "http://localhost:" + port.(string) + str
 }
 
 // CreateToken
@@ -72,10 +71,10 @@ func CreateToken(c *gin.Context) {
 		"args":      {string(goutils.ToJson(args))},
 		"transient": {string(goutils.ToJson(rawTransient))},
 	}
-	var _url = BuildURL("/fabric/create-proposal")
+	var _url = BuildURL(c, "/fabric/create-proposal")
 	response := http.PostForm(_url, body, nil)
 	var result = model.CreateProposalResult{}
 	goutils.FromJson(response.BodyBytes(), &result)
-	c.JSON(http2.StatusOK, model.CreateTokenResult{result, token})
+	c.JSON(http2.StatusOK, model.CreateTokenResult{CreateProposalResult: result, Token: token})
 
 }
