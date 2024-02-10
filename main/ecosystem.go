@@ -12,11 +12,11 @@ import (
 )
 
 const (
-	FcnCreateToken  = "createToken"
-	FcnGetToken     = "getToken"
-	FcnTokenHistory = "tokenHistory"
-	FcnDeleteToken  = "deleteToken"
-	FcnMoveToken    = "moveToken"
+	FcnCreateToken  = "CreateToken"
+	FcnGetToken     = "GetToken"
+	FcnTokenHistory = "TokenHistory"
+	FcnDeleteToken  = "DeleteToken"
+	FcnMoveToken    = "MoveToken"
 )
 const chaincode = "ecosystem"
 
@@ -40,21 +40,16 @@ func BuildURL(context *gin.Context, route string) string {
 // @Param channel formData string true "Fabric channel name"
 func CreateToken(c *gin.Context) {
 	owner := c.PostForm("owner")
-	content := c.PostForm("content")
 	var mintTime goutils.TimeLong
 	mintTime = mintTime.FromTime(time.Now())
 
 	// Create Proposal
 	type TokenCreateRequest struct {
-		Owner    string
-		MintTime goutils.TimeLong
-		Content  []byte
+		Owner string
 	}
 
 	var request = TokenCreateRequest{
-		Owner:    owner,
-		MintTime: mintTime,
-		Content:  []byte(content),
+		Owner: owner,
 	}
 	var args = []string{FcnCreateToken, string(goutils.ToJson(request))}
 

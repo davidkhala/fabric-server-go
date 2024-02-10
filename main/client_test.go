@@ -7,8 +7,10 @@ import (
 	"github.com/davidkhala/fabric-server-go/model"
 	"github.com/davidkhala/goutils"
 	"github.com/davidkhala/goutils/http"
+	"github.com/hyperledger/fabric-protos-go-apiv2/common"
 	"github.com/hyperledger/fabric-protos-go-apiv2/peer"
 	"github.com/kortschak/utter"
+	"github.com/stretchr/testify/assert"
 	rawHttp "net/http"
 	"net/url"
 	"testing"
@@ -35,7 +37,7 @@ var endorsers = []model.Node{
 	},
 }
 
-func postProposal(result model.CreateProposalResult, signer *golang.Crypto) {
+func postProposal(t *testing.T, result model.CreateProposalResult, signer *golang.Crypto) {
 	var signedBytes = client.GetProposalSigned(result.Proposal, signer)
 	var transactionBytes = client.CommitProposalAndSign(result.Proposal, signedBytes, endorsers, *signer)
 	var orderer = model.Node{
@@ -45,7 +47,7 @@ func postProposal(result model.CreateProposalResult, signer *golang.Crypto) {
 	}
 	println("...before commit transactionBytes")
 	var status = client.Commit(orderer, transactionBytes)
-	println("commit status=" + status)
+	assert.Equal(t, common.Status_SUCCESS.String(), status)
 	waitForTx(result.Txid)
 }
 func waitForTx(txid string) {
@@ -94,7 +96,7 @@ func TestTransaction(t *testing.T) {
 	var result = model.CreateProposalResult{}
 	goutils.FromJson(response.BodyBytes(), &result)
 	utter.Dump(result)
-	postProposal(result, signer)
+	postProposal(t, result, signer)
 }
 func TestQuery(t *testing.T) {
 	var signer = golang.LoadCryptoFrom(cryptoConfig)
@@ -117,20 +119,4 @@ func TestQuery(t *testing.T) {
 	var signedBytes = client.GetProposalSigned(result.Proposal, signer)
 	var queryResult = client.QueryProposal(result.Proposal, signedBytes, endorsers)
 	println(queryResult)
-}
-func TestCreateToken(t *testing.T) {
-	var signer = golang.LoadCryptoFrom(cryptoConfig)
-
-	var body = url.Values{
-		"creator": {model.BytesPacked(signer.Creator)},
-		"channel": {channel},
-		"owner":   {"david"},
-		"content": {"github.com/delphi-fabric"},
-	}
-	var _url = client.BuildURL("/ecosystem/createToken")
-	var response = http.PostForm(_url, body, nil)
-	var result = model.CreateTokenResult{}
-	goutils.FromJson(response.BodyBytes(), &result)
-	utter.Dump("Token:" + result.Token)
-	postProposal(result.CreateProposalResult, signer)
 }

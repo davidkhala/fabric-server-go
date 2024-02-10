@@ -5,7 +5,6 @@ import (
 	"github.com/davidkhala/fabric-server-go/model"
 	"github.com/davidkhala/goutils"
 	"github.com/davidkhala/goutils/http"
-	"github.com/hyperledger/fabric-protos-go-apiv2/common"
 	"github.com/hyperledger/fabric-protos-go-apiv2/orderer"
 	"github.com/hyperledger/fabric-protos-go-apiv2/peer"
 	"net/url"
@@ -34,7 +33,7 @@ func Propose(proposal string, signedBytes []byte, endorsers []model.Node) (propo
 		"signed-proposal": {model.BytesPacked(signedBytes)},
 		"proposal":        {proposal},
 	}
-	var response = http.PostForm(_url, body, nil) // TODO change to https
+	var response = http.PostForm(_url, body, nil)
 	var result = model.ProposalResponseResult{}
 	return result.ParseOrPanic(response.BodyBytes())
 }
@@ -49,5 +48,5 @@ func Commit(_orderer model.Node, transactionBytes []byte) string {
 	var response = http.PostForm(_url, body, nil)
 	var txResult = &orderer.BroadcastResponse{}
 	goutils.FromJson(response.BodyBytes(), txResult)
-	return common.Status_name[int32(txResult.Status)]
+	return txResult.Status.String()
 }
