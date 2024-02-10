@@ -29,6 +29,30 @@ info:
   title: github.com/davidkhala/fabric-server-go
   version: v0.0.0
 paths:
+  /ecosystem/create-token:
+    post:
+      parameters:
+      - description: Token owner
+        in: formData
+        name: owner
+        required: true
+        type: string
+      - description: Token Content
+        in: formData
+        name: content
+        required: true
+        type: string
+      - description: signer creator in bytes
+        in: formData
+        name: creator
+        required: true
+        type: string
+      - description: Fabric channel name
+        in: formData
+        name: channel
+        required: true
+        type: string
+      responses: {}
   /fabric/create-proposal:
     post:
       consumes:
@@ -147,4 +171,13 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/model.ProposalResponseResult'
+  /ping:
+    get:
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: pong
+          schema:
+            type: string
 swagger: "2.0"

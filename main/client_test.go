@@ -1,11 +1,15 @@
-package client
+package main
 
 import (
+	"context"
 	"github.com/davidkhala/fabric-common/golang"
+	"github.com/davidkhala/fabric-server-go/client"
 	"github.com/davidkhala/fabric-server-go/model"
 	"github.com/davidkhala/goutils"
 	"github.com/davidkhala/goutils/http"
+	"github.com/hyperledger/fabric-protos-go-apiv2/peer"
 	"github.com/kortschak/utter"
+	rawHttp "net/http"
 	"net/url"
 	"testing"
 )
@@ -17,43 +21,64 @@ var cryptoConfig = golang.CryptoConfig{
 }
 
 // client side cache
-var txid string
 var channel = "allchannel"
 var endorsers = []model.Node{
 	{
 		Address:               "localhost:8051",
-		TLSCARoot:             string(ReadPEMFile(goutils.HomeResolve("delphi-fabric/config/ca-crypto-config/peerOrganizations/icdd/tlsca/tlsca.icdd-cert.pem"))),
+		TLSCARoot:             string(client.ReadPEMFile(goutils.HomeResolve("delphi-fabric/config/ca-crypto-config/peerOrganizations/icdd/tlsca/tlsca.icdd-cert.pem"))),
 		SslTargetNameOverride: "peer0.icdd",
 	},
 	{
 		Address:               "localhost:7051",
-		TLSCARoot:             string(ReadPEMFile(goutils.HomeResolve("delphi-fabric/config/ca-crypto-config/peerOrganizations/astri.org/peers/peer0.astri.org/tls/ca.crt"))),
+		TLSCARoot:             string(client.ReadPEMFile(goutils.HomeResolve("delphi-fabric/config/ca-crypto-config/peerOrganizations/astri.org/peers/peer0.astri.org/tls/ca.crt"))),
 		SslTargetNameOverride: "peer0.astri.org",
 	},
 }
 
 func postProposal(result model.CreateProposalResult, signer *golang.Crypto) {
-	var signedBytes = GetProposalSigned(result.Proposal, signer)
-	txid = result.Txid
-	var transactionBytes = CommitProposalAndSign(result.Proposal, signedBytes, endorsers, *signer)
+	var signedBytes = client.GetProposalSigned(result.Proposal, signer)
+	var transactionBytes = client.CommitProposalAndSign(result.Proposal, signedBytes, endorsers, *signer)
 	var orderer = model.Node{
 		Address:               "localhost:7050",
-		TLSCARoot:             string(ReadPEMFile(goutils.HomeResolve("delphi-fabric/config/ca-crypto-config/ordererOrganizations/hyperledger/orderers/orderer0.hyperledger/tls/ca.crt"))),
+		TLSCARoot:             string(client.ReadPEMFile(goutils.HomeResolve("delphi-fabric/config/ca-crypto-config/ordererOrganizations/hyperledger/orderers/orderer0.hyperledger/tls/ca.crt"))),
 		SslTargetNameOverride: "orderer0.hyperledger",
 	}
 	println("...before commit transactionBytes")
-	var status = Commit(orderer, transactionBytes)
+	var status = client.Commit(orderer, transactionBytes)
 	println("commit status=" + status)
-	waitForTx(txid)
+	waitForTx(result.Txid)
 }
 func waitForTx(txid string) {
-	var eventer = EventerFrom(endorsers[0])
-	var signer = InitOrPanic(cryptoConfig)
+	var eventer = client.EventerFrom(endorsers[0])
+	var signer = golang.LoadCryptoFrom(cryptoConfig)
 	var txStatus = eventer.WaitForTx(channel, txid, signer)
-	println("tx status=" + txStatus)
+	goutils.AssertOK(txStatus == peer.TxValidationCode_VALID.String(), txid+" is invalid")
+}
+func TestMain(m *testing.M) {
+	ctx, cancel := context.WithCancel(context.Background())
+	go func(ctx context.Context) {
+		main()
+	}(ctx)
+	m.Run()
+	cancel()
+}
+func TestPing(t *testing.T) {
+	var _url = client.BuildURL("/fabric/ping")
+	var _path = goutils.HomeResolve("delphi-fabric/config/ca-crypto-config/peerOrganizations/icdd/tlsca/tlsca.icdd-cert.pem")
+	var Certificate = model.BytesPacked(client.ReadPEMFile(_path))
+
+	var body = url.Values{
+		"address":                  {"localhost:8051"},
+		"certificate":              {Certificate},
+		"ssl-target-name-override": {"peer0.icdd"},
+	}
+
+	response, err := rawHttp.PostForm(_url, body)
+	goutils.PanicError(err)
+	utter.Dump(response.Status)
 }
 func TestTransaction(t *testing.T) {
-	var signer = InitOrPanic(cryptoConfig)
+	var signer = golang.LoadCryptoFrom(cryptoConfig)
 	var chaincode = "contracts"
 	var args = []string{"StupidContract:ping"}
 
@@ -64,7 +89,7 @@ func TestTransaction(t *testing.T) {
 		"chaincode": {chaincode},
 		"args":      {string(goutils.ToJson(args))},
 	}
-	var _url = BuildURL("/fabric/create-proposal")
+	var _url = client.BuildURL("/fabric/create-proposal")
 	var response = http.PostForm(_url, body, nil)
 	var result = model.CreateProposalResult{}
 	goutils.FromJson(response.BodyBytes(), &result)
@@ -72,7 +97,7 @@ func TestTransaction(t *testing.T) {
 	postProposal(result, signer)
 }
 func TestQuery(t *testing.T) {
-	var signer = InitOrPanic(cryptoConfig)
+	var signer = golang.LoadCryptoFrom(cryptoConfig)
 	var chaincode = "contracts"
 	var args = []string{"SmartContract:who"}
 	var body = url.Values{
@@ -82,19 +107,19 @@ func TestQuery(t *testing.T) {
 		"args":      {string(goutils.ToJson(args))},
 	}
 
-	var _url = BuildURL("/fabric/create-proposal")
+	var _url = client.BuildURL("/fabric/create-proposal")
 	var response = http.PostForm(_url, body, nil)
 	var result = model.CreateProposalResult{}
 	goutils.FromJson(response.BodyBytes(), &result)
 	utter.Dump(result)
 
 	// phase 2: QueryProposal
-	var signedBytes = GetProposalSigned(result.Proposal, signer)
-	var queryResult = QueryProposal(result.Proposal, signedBytes, endorsers)
+	var signedBytes = client.GetProposalSigned(result.Proposal, signer)
+	var queryResult = client.QueryProposal(result.Proposal, signedBytes, endorsers)
 	println(queryResult)
 }
 func TestCreateToken(t *testing.T) {
-	var signer = InitOrPanic(cryptoConfig)
+	var signer = golang.LoadCryptoFrom(cryptoConfig)
 
 	var body = url.Values{
 		"creator": {model.BytesPacked(signer.Creator)},
@@ -102,7 +127,7 @@ func TestCreateToken(t *testing.T) {
 		"owner":   {"david"},
 		"content": {"github.com/delphi-fabric"},
 	}
-	var _url = BuildURL("/ecosystem/createToken")
+	var _url = client.BuildURL("/ecosystem/createToken")
 	var response = http.PostForm(_url, body, nil)
 	var result = model.CreateTokenResult{}
 	goutils.FromJson(response.BodyBytes(), &result)

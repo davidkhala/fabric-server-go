@@ -1,7 +1,6 @@
 package gateway
 
 import (
-	"context"
 	"github.com/davidkhala/fabric-common/golang"
 	"github.com/davidkhala/fabric-server-go/model"
 	"github.com/davidkhala/goutils"
@@ -63,7 +62,6 @@ func ProcessProposal(c *gin.Context) {
 	var signed = peer.SignedProposal{}
 	err := proto.Unmarshal(signedBytes, &signed)
 	goutils.PanicError(err)
-	ctx := context.Background()
 	var proposalResponses []*peer.ProposalResponse
 	var proposalResponseAsStrings []string
 	var endorserNodes []model.Node
@@ -74,10 +72,10 @@ func ProcessProposal(c *gin.Context) {
 			TLSCARootByte:         model.BytesFromString(node.TLSCARoot),
 			SslTargetNameOverride: node.SslTargetNameOverride,
 		}
-		grpcClient, _err := nodeTranslated.AsGRPCClient()
-		goutils.PanicError(_err) // TODO use strategy here
-		endorserClient := golang.EndorserFrom(grpcClient)
-		proposalResponse, _err := endorserClient.ProcessProposal(ctx, &signed)
+		grpcClient := nodeTranslated.AsGRPCClientOrPanic() // FIXME multiple error type
+
+		endorserClient := golang.EndorserFrom(c, grpcClient)
+		proposalResponse, _err := endorserClient.ProcessProposal(&signed)
 		goutils.PanicError(_err)
 		proposalResponses = append(proposalResponses, proposalResponse)
 
@@ -116,12 +114,12 @@ func Commit(c *gin.Context) {
 		TLSCARootByte:         model.BytesFromString(ordererNode.TLSCARoot),
 		SslTargetNameOverride: ordererNode.SslTargetNameOverride,
 	}
-	ordererGrpc, err := nodeTranslated.AsGRPCClient()
-	goutils.PanicError(err)
+	ordererGrpc := nodeTranslated.AsGRPCClientOrPanic() // FIXME multiple error type
+
 	var committer = golang.Committer{
 		AtomicBroadcastClient: golang.CommitterFrom(ordererGrpc),
 	}
-	err = committer.Setup()
+	err = committer.Setup(c)
 	goutils.PanicError(err)
 
 	txResult, err := committer.SendRecv(envelop)

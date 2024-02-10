@@ -25,16 +25,15 @@ func tokenGenerator() string {
 	return id.String()
 }
 
-func BuildURL(context *gin.Context, str string) string {
+func BuildURL(context *gin.Context, route string) string {
 
-	port, exists := context.Get("port")
-	if !exists {
-		port = "8080"
-	}
-	return "http://localhost:" + port.(string) + str
+	port := context.GetString("PORT")
+
+	return "http://localhost:" + port + route
 }
 
 // CreateToken
+// @Router /ecosystem/create-token [post]
 // @Param owner formData string true "Token owner"
 // @Param content formData string true "Token Content"
 // @Param creator formData string true "signer creator in bytes"

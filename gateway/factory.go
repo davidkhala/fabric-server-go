@@ -2,7 +2,7 @@ package gateway
 
 import (
 	"bytes"
-	"github.com/davidkhala/fabric-common/golang"
+	"github.com/davidkhala/fabric-common/golang/proposal"
 	"github.com/davidkhala/fabric-server-go/model"
 	"github.com/davidkhala/goutils"
 	"github.com/davidkhala/protoutil"
@@ -43,19 +43,19 @@ func CreateProposal(c *gin.Context) {
 		transientBytes = nil
 	}
 
-	proposal, txid, err := golang.CreateProposal(
+	createdProposal, txid, err := proposal.CreateProposal(
 		creator,
 		channel,
 		chaincode,
-		"",
+		args,
 		transientBytes,
-		args...,
+		proposal.WithType(peer.ChaincodeSpec_GOLANG),
 	)
 
 	goutils.PanicError(err)
 
 	c.JSON(http.StatusOK, model.CreateProposalResult{
-		Proposal: model.BytesPacked(protoutil.MarshalOrPanic(proposal)),
+		Proposal: model.BytesPacked(protoutil.MarshalOrPanic(createdProposal)),
 		Txid:     txid,
 	})
 }

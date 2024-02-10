@@ -13,12 +13,6 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-func InitOrPanic(config golang.CryptoConfig) *golang.Crypto {
-	cryptoObject, err := golang.LoadCryptoFrom(config)
-	goutils.PanicError(err)
-	return cryptoObject
-}
-
 func ReadPEMFile(file string) []byte {
 	byteSlice, err := goutils.ReadFile(file)
 	goutils.PanicError(err)
@@ -85,10 +79,9 @@ func (GetTransactionByIDResult) FromString(str string) GetTransactionByIDResult 
 }
 
 type Eventer struct {
-	event.BlockEventer
+	event.Eventer
 }
 
-// TODO support multiple eventer
 func EventerFrom(node model.Node) Eventer {
 
 	var node_translated = golang.Node{
@@ -96,19 +89,22 @@ func EventerFrom(node model.Node) Eventer {
 		TLSCARootByte:         model.BytesFromString(node.TLSCARoot),
 		SslTargetNameOverride: node.SslTargetNameOverride,
 	}
-	grpcClient, err := node_translated.AsGRPCClient()
-	goutils.PanicError(err)
+	grpcClient := node_translated.AsGRPCClientOrPanic() // FIXME multiple error type
+
 	var baseEventer = event.NewEventer(context.Background(), grpcClient)
-	var blockEventer = event.NewBlockEventer(baseEventer)
-	return Eventer{blockEventer}
+	return Eventer{Eventer: baseEventer}
 }
 
 func (e Eventer) WaitForTx(channel, txid string, signer *golang.Crypto) (txStatus string) {
-	var txEventer = event.NewTransactionListener(e.BlockEventer, txid)
+	var blockEventer = event.NewSimpleBlockEventer(e.Eventer)
+	var txEventer = event.TransactionListener{
+		BlockEventer: blockEventer,
+	}
+	txEventer.WaitForTx(txid)
 	var seek = txEventer.GetSeekInfo()
-	signedEvent, err := seek.SignBy(channel, signer)
-	goutils.PanicError(err)
-	receipt, _ := txEventer.SendRecv(signedEvent)
+
+	receipt, _ := txEventer.SendRecv(seek.SignBy(channel, signer))
+
 	txStatus = receipt.(string)
 	return
 }
